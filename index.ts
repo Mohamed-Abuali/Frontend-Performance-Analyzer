@@ -6,7 +6,7 @@ import { readFile ,readFileSync} from "fs"
 import traverse from "@babel/traverse"
 
 const projectPath = process.cwd()
-const files = globSync("src/**/*.{js,jsx,ts,tsx,html}",{
+const files = globSync("src/**/*.{js,jsx,ts,tsx}",{
     cwd:projectPath,
     ignore:["node_modules/**", "dist/**"]
 })

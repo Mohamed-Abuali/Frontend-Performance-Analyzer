@@ -2,6 +2,7 @@ import {globSync} from "glob"
 import {parse} from "@babel/parser"
 import path from "path"
 import { readFile ,readFileSync} from "fs"
+//import * as Rules from "./rules.json"
 // @ts-ignore
 import traverse from "@babel/traverse"
 
@@ -12,8 +13,7 @@ type issue = {
     line:number;
 }
 const issues:issue[] = []
-
-
+const Rules = JSON.parse(readFileSync(path.join(process.cwd(), "rules.json"), "utf-8"))
 const projectPath = process.cwd()
 const files = globSync("src/**/*.{js,jsx,ts,tsx}",{
     cwd:projectPath,
@@ -44,16 +44,17 @@ function analysisCode(ats:any,file:string) {
     
     traverse(ats,{
         JSXAttribute(path:any){
-            if(path.node.name.name === "onClick" && path.node.value?.expression?.type === "ArrowFunctionExpression"){
-               issues.push({
-                rule:"",
-                message:"",
+            for(const rule of Rules){
+                if(path.node.name.name.include(rule["attributeNames"]) && path.node.value?.expression?.type === rule["expressionType"]){
+                issues.push({
+                rule:rule["ruleName"],
+                message:rule["message"],
                 file,
                 line:path.node.loc?.start.line ?? 0
                })
-                
-                
+                }
             }
+         
         }
     })
 }

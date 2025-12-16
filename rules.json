@@ -1,0 +1,70 @@
+{
+  "rules": [
+    {
+      "id": "R001",
+      "ruleName": "no-inline-functions-in-jsx",
+      "name": "Inline function in JSX event handler",
+      "category": "render-performance",
+      "nodeType": "JSXAttribute",
+      "attributeNames": ["onClick", "onChange", "onSubmit", "onMouseEnter"],
+      "expressionType": "ArrowFunctionExpression",
+      "message": "Avoid inline arrow functions in JSX event handlers. This creates a new function on every render.",
+      "severity": "medium"
+    },
+    {
+      "id": "R002",
+      "ruleName": "no-inline-objects-in-jsx",
+      "name": "Inline object literal in JSX prop",
+      "category": "render-performance",
+      "nodeType": "JSXAttribute",
+      "attributeNames": ["style", "options", "config"],
+      "expressionType": "ObjectExpression",
+      "message": "Avoid inline object literals in JSX props. This breaks memoization and causes unnecessary re-renders.",
+      "severity": "medium"
+    },
+    {
+      "id": "R003",
+      "ruleName": "no-inline-arrays-in-jsx",
+      "name": "Inline array literal in JSX prop",
+      "category": "render-performance",
+      "nodeType": "JSXAttribute",
+      "attributeNames": ["items", "data", "values"],
+      "expressionType": "ArrayExpression",
+      "message": "Avoid inline array literals in JSX props. Arrays are recreated on every render.",
+      "severity": "medium"
+    },
+    {
+      "id": "R004",
+      "ruleName": "missing-key-in-list",
+      "name": "Missing key prop in list rendering",
+      "category": "reconciliation",
+      "nodeType": "JSXElement",
+      "attributeNames": ["key"],
+      "expressionType": "ArrayMap",
+      "message": "Each element rendered in a list should have a unique 'key' prop to help React optimize reconciliation.",
+      "severity": "high"
+    },
+    {
+      "id": "R005",
+      "ruleName": "missing-useeffect-deps",
+      "name": "useEffect missing dependency array",
+      "category": "hooks",
+      "nodeType": "CallExpression",
+      "attributeNames": ["useEffect"],
+      "expressionType": "CallExpression",
+      "message": "useEffect is missing a dependency array. This can cause unnecessary re-runs and performance issues.",
+      "severity": "high"
+    },
+    {
+      "id": "R006",
+      "ruleName": "component-too-large",
+      "name": "Large React component",
+      "category": "component-structure",
+      "nodeType": "FunctionDeclaration",
+      "attributeNames": ["Component"],
+      "expressionType": "LargeComponent",
+      "message": "This component is very large. Consider splitting it into smaller components for better performance and maintainability.",
+      "severity": "low"
+    }
+  ]
+}

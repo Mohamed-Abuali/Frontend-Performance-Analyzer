@@ -5,17 +5,26 @@ import { readFile ,readFileSync} from "fs"
 // @ts-ignore
 import traverse from "@babel/traverse"
 
+type issue = {
+    rule:string;
+    message:string;
+    file:string;
+    line:number;
+}
+const issues:issue[] = []
+
+
 const projectPath = process.cwd()
 const files = globSync("src/**/*.{js,jsx,ts,tsx}",{
     cwd:projectPath,
     ignore:["node_modules/**", "dist/**"]
 })
 for(const file of files){
-    const path = readFiles(file)
-    console.log(path)
-    const ats =parseToAST(path)
+    const codePath = readFiles(file)
+    console.log(codePath)
+    const ats =parseToAST(codePath)
     console.log(ats)
-    analysisCode(ats)
+    analysisCode(ats,file)
 }
 
 function readFiles(file:string){
@@ -31,13 +40,19 @@ const ats = parse(code,{
 })
 return ats;
 }
-function analysisCode(ats:any) {
+function analysisCode(ats:any,file:string) {
+    
     traverse(ats,{
         JSXAttribute(path:any){
-            if(path.node.name.name === "onClick"){
-                if(path.node.values?.expression?.type === "ArrowFunctionExpression"){
-                    console.log("⚠ Inline function in JSX")
-                }
+            if(path.node.name.name === "onClick" && path.node.value?.expression?.type === "ArrowFunctionExpression"){
+               issues.push({
+                rule:"",
+                message:"",
+                file,
+                line:path.node.loc?.start.line ?? 0
+               })
+                
+                
             }
         }
     })

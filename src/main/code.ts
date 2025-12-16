@@ -48,7 +48,7 @@ class TaskQueue<T = unknown> {
     const next = Array.from(this.tasks.values()).find(
       (t) => t.status === 'pending'
     );
-    if (!next) retur;
+    if (!next) retur
 
     this.running++;
     next.status = 'running';

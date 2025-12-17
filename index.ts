@@ -11,6 +11,8 @@ type issue = {
     message:string;
     file:string;
     line:number;
+    level:string;
+    category:string;
 }
 const issues:issue[] = []
 const Rules = JSON.parse(readFileSync(path.join(process.cwd(), "rules.json"), "utf-8"))
@@ -50,7 +52,9 @@ function analysisCode(ats:any,file:string) {
                 rule:rule["ruleName"],
                 message:rule["message"],
                 file,
-                line:path.node.loc?.start.line ?? 0
+                line:path.node.loc?.start.line ?? 0,
+                level:rule["severity"],
+                category:rule["category"]
                })
                 }
             }

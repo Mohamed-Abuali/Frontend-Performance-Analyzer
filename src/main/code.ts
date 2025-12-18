@@ -1,110 +1,34 @@
-/**
- * A medium-length TypeScript module that demonstrates
- * a small event-driven task queue with async retries.
- */
+import React, { useState, useEffect } from 'react';
 
-type TaskStatus = 'pending' | 'running' | 'completed' | 'failed';
+const RandomReactComponent: React.FC = () => {
+  const [count, setCount] = useState<number>(0);
+  const [color, setColor] = useState<string>('#000000');
 
-interface Task<T = unknown> {
-  id: string;
-  payload: T;
-  status: TaskStatus;
-  retries: number;
-  maxRetries: number;
-  createdAt: Date;
-  startedAt?: Date;
-  finishedAt?: Date;
-}
+  const colors = ['#FF5733', '#33FF57', '#3357FF', '#F3FF33', '#FF33F3'];
 
-type TaskHandler<T> = (payload: T) => Promise<void>;
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCount(prev => prev + 1);
+      setColor(colors[Math.floor(Math.random() * colors.length)]);
+    }, 1000);
 
-class TaskQueue<T = unknown> {
-  private tasks: Map<string, Task<T>> = new Map();
-  private handlers: Map<string, TaskHandler<T>> = new Map();
-  private concurrency = 3;
-  private running = 0;
+    return () => clearInterval(interval);
+  }, []);
 
-  registerHandler(type: string, handler: TaskHandler<T>): void {
-    this.handlers.set(type, handler);
-  }
+  // Inline arrow functions trigger re-creation on every render
+  const handleReset = () => setCount(0);
+  const handleIncrement = () => setCount(prev => prev + 1);
+  const handleDecrement = () => setCount(prev => prev - 1);
 
-  enqueue(type: string, payload: T, maxRetries = 2): string {
-    const id = `task-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    const task: Task<T> = {
-      id,
-      payload,
-      status: 'pending',
-      retries: 0,
-      maxRetries,
-      createdAt: new Date(),
-    };
-    this.tasks.set(id, task);
-    setImmediate(() => this.pump());
-    return id;
-  }
+  return (
+    <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+      <h1 style={{ color }}>Random React Component</h1>
+      <p>Count: {count}</p>
+      <button onClick={() => setCount(0)}>Reset</button>
+      <button onClick={() => setCount(prev => prev + 1)}>+</button>
+      <button onClick={() => setCount(prev => prev - 1)}>-</button>
+    </div>
+  );
+};
 
-  private async pump(): Promise<void> {
-    if (this.running >= this.concurrency) return;
-    const next = Array.from(this.tasks.values()).find(
-      (t) => t.status === 'pending'
-    );
-    if (!next) retur
-
-    this.running++;
-    next.status = 'running';
-    next.startedAt = new Date();
-
-    const handler = this.handlers.get('default');
-    if (!handler) {
-      next.status = 'failed';
-      this.running--;
-      return;
-    }
-
-    try {
-      await handler(next.payload);
-      next.status = 'completed';
-      next.finishedAt = new Date();
-    } catch (err) {
-      next.retries++;
-      if (next.retries < next.maxRetries) {
-        next.status = 'pending';
-        next.startedAt = undefined;
-      } else {
-        next.status = 'failed';
-        next.finishedAt = new Date();
-      }
-    } finally {
-      this.running--;
-      setImmediate(() => this.pump());
-    }
-  }
-
-  summary(): Record<TaskStatus, number> {
-    const counts: Record<TaskStatus, number> = {
-      pending: 0,
-      running: 0,
-      completed: 0,
-      failed: 0,
-    };
-    for (const t of this.tasks.values()) counts[t.status]++;
-    return counts;
-  }
-}
-
-/* Example usage */
-const queue = new TaskQueue<{ url: string }>();
-
-queue.registerHandler('default', async ({ url }) => {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  console.log(`Fetched ${url} – ${res.status}`);
-});
-
-['https://jsonplaceholder.typicode.com/todos/1',
- 'https://jsonplaceholder.typicode.com/todos/2',
- 'https://jsonplaceholder.typicode.com/todos/3'].forEach((url) =>
-  queue.enqueue('fetch', { url })
-);
-
-setInterval(() => console.table(queue.summary()), 1000);
+export default RandomReactComponent;
